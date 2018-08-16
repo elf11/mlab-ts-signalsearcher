@@ -3,6 +3,8 @@ import numpy as np
 
 import numba
 
+import argparse
+
 import stationary as st 
 
 
@@ -37,6 +39,42 @@ def single_autocorrelation(series, lag):
 
     divider = np.sqrt(np.sum(ds1 * ds1)) * np.sqrt(np.sum(ds2 * ds2))
     return np.sum(ds1 * ds2) / divider if divider != 0 else 0
+
+@numba.jit(nopython=True)
+def batch_autocorrelation(data, lag, starts, ends, threshold, backoffset=0):
+    """
+    Autocorrelation for all timeseries at once
+    :param data: timeseries, shape [n_astimeseries, n_days]
+    :param lag: lag, days
+    :param starts: vector of start index for each series
+    :param ends: vector of end index for each series
+    :param threshold: ratio of timeseries to lag to calculate autocorrelation
+    :param backoffset: offset from the series end, in days
+    :return: autocorrelation, shape [n_series]. if series is to short then autocorrelation is NaN
+    """
+    n_series = data.shape[0]
+    n_days = data.shape[1]
+    max_end = n_days - backoffset
+    corr = np.empty(n_series, dtype=np.float64)
+    support = np.empty(n_series, dtype=np.float64)
+    for i in range(n_series):
+        series = data[i]
+        end = min(max_end, ends[i])
+        real_len = end - starts[i]
+        support[i] = real_len / lag
+        if support[i] > threshold:
+            series = series[starts[i]:end]
+            # average lag between exact lag and two nearest neighbors for smoothnes
+            c_365 = single_autocorrelation(series, lag)
+            c_364 = single_autocorrelation(series, lag - 1)
+            c_366 = single_autocorrelation(series, lag + 1)
+            corr[i] = 0.5 * c_365 + 0.25 * c_364 + 0.25 * c_366
+        else:
+            corr[i] = np.NaN
+    
+    return corr
+
+
 
 @numba.jit(nopython=True)
 def find_start_end_series(data):
@@ -102,3 +140,112 @@ def lag_indexes(start, end):
     
     return [lag(pd.DateOffset(months=m)) for m in (3,6,9,12)]
 
+def normalize(values):
+    return (values - values.mean()) / np.std(values)
+
+def uniq_country_map(ases):
+    """
+    Find AS country for all unique ASes i.e. group ASes by country
+    :param ases: all ASes (must be presorted)
+    :return: array[num_unique_ases, num_countries_world], where each column corresponds to country and each row corresponds to unique AS
+    Value is an index of AS in source ASes array, if country is missing, value is -1
+    """
+
+def uniq_continent_map(ases):
+    """
+    Find AS continent for all unique ASes, i.e. group ASes by continent
+    :param asses: all ASes (must be presorted)
+    :return: array[num_unique_ases, 7], where each column corresponds to continent and each row corresponds to unique AS
+    Value is an index of AS in source ASes array, if continent is missing, value is -1
+    """
+    
+
+def run():
+    parser = argparse.ArgumentParser(description='Prepare data')
+    parser.add_argument('--data_dir',
+                        default='/home/oniculaescu/mlab-ts-signalsearcher/features',
+                        help='The location where we are going to save the features for constructing the NN')
+    parser.add_argument('--threshold', 
+                        default=0.0, 
+                        type=float, 
+                        help='Series minimal length threshold/points of data length')
+    parser.add_argument('--add_days', 
+                        default=64, 
+                        type=int, 
+                        help='Number of days to be added in the future for prediction')
+    parser.add_argument('--start', help='Effective start date')
+    parser.add_argument('--end', help="Effective end date")
+    parser.add_argument('--backoffset', 
+                        default=0, 
+                        type=int, 
+                        help="Offset for correlation computation")
+    
+    args = parser.parse_args()
+
+    # get the data
+    df, nans, starts, ends = prepare_data(args.start, args.end, args.threshold)
+
+    # find the working date range
+    data_start, data_end = df.columns[0], df.columns[-1]
+
+    # project date-dependent features (like day of week) to the future dates for prediction
+    features_end = data + pd.Timedelta(args.add_days, unit='D')
+    print(f"start: {data_start}. end: {data_end}, features_end: {features_end}")
+
+    # yearly autocorrelation
+    raw_year_autocorr = batch_autocorr(df.values, 365, starts, ends, 1.5, args.corr_backoffset)
+    year_unknown_pct = np.sum(np.isnan(raw_year_autocorr))/len(raw_year_autocorr) # type: float
+
+    # quarterly autocorrelation
+    raw_quarter_autocorr = batch_autocorr(df.values, int(round(365.25/4)), starts, ends, 2, args.corr_backoffset)
+    quarter_unknown_pct = np.sum(np.isnan(raw_quarter_autocorr)) / len(raw_quarter_autocorr) # type: float
+    
+    print("Percent of undefined autocorr = yearly:%.3f, quarterly:%.3f" % (year_unknown_pct, quarter_unknown_pct))
+    
+    # Normalise all the things
+    year_autocorr = normalize(np.nan_to_num(raw_year_autocorr))
+    quarter_autocorr = normalize(np.nan_to_num(raw_quarter_autocorr))
+
+    # Make time-dependent features
+    features_days = pd.date_range(data_start, features_end)
+    #dow = normalize(features_days.dayofweek.values)
+    week_period = 7 / (2 * np.pi)
+    dow_norm = features_days.dayofweek.values / week_period
+    dow = np.stack([np.cos(dow_norm), np.sin(dow_norm)], axis=-1)
+
+    # Assemble indices for quarterly lagged data
+    lagged_ix = np.stack(lag_indexes(data_start, features_end), axis=-1)
+
+    page_popularity = df.median(axis=1)
+    page_popularity = (page_popularity - page_popularity.mean()) / page_popularity.std()
+
+    # Put NaNs back
+    df[nans] = np.NaN
+
+    # Assemble final output
+    tensors = dict(
+        hits=df,
+        lagged_ix=lagged_ix,
+        page_map=page_map,
+        page_ix=df.index.values,
+        page_popularity=page_popularity,
+        year_autocorr=year_autocorr,
+        quarter_autocorr=quarter_autocorr,
+        dow=dow,
+    )
+    plain = dict(
+        features_days=len(features_days),
+        data_days=len(df.columns),
+        n_pages=len(df),
+        data_start=data_start,
+        data_end=data_end,
+        features_end=features_end
+
+    )
+
+    # Store data to the disk
+    VarFeeder(args.data_dir, tensors, plain)
+
+
+if __name__ == '__main':
+    run()
