@@ -7,6 +7,8 @@ import argparse
 
 import stationary as st 
 
+from feeder import VarFeeder
+
 
 def read_start_end(attr, start, end):
     """
