@@ -143,6 +143,16 @@ def lag_indexes(start, end):
 def normalize(values):
     return (values - values.mean()) / np.std(values)
 
+def read_countries_dict():
+    countries = {}
+    val = 0
+    with open('countries.csv') as f:
+        for line in f:
+            countries[str(line)] = val
+            val = val + 1
+    return countries
+
+
 def uniq_country_map(ases):
     """
     Find AS country for all unique ASes i.e. group ASes by country
@@ -150,15 +160,43 @@ def uniq_country_map(ases):
     :return: array[num_unique_ases, num_countries_world], where each column corresponds to country and each row corresponds to unique AS
     Value is an index of AS in source ASes array, if country is missing, value is -1
     """
+    countries = read_countries_dict()
+    lenC = len(countries)
+    result = np.full([len(ases), lenC], -1, dtype=np.int32)
+
+    prev_as = None
+    num_page = -1
+    for i, entity in enumerate(ases):
+        key_as, loc = entity.rsplit('|', 1)
+        country = loc[2:4]
+        if entity != prev_as:
+            prev_as = entity
+            num_page += 1
+        result[num_page, countries[country]] = i
+    return result[:num_page+1]
 
 def uniq_continent_map(ases):
     """
+    NOTE TODO -already done just make sure you see it: for this one you can only send the keys in, you extract country/continent from the key
     Find AS continent for all unique ASes, i.e. group ASes by continent
     :param asses: all ASes (must be presorted)
     :return: array[num_unique_ases, 7], where each column corresponds to continent and each row corresponds to unique AS
     Value is an index of AS in source ASes array, if continent is missing, value is -1
     """
-    
+    result = np.full([len(ases), 7], -1, dtype=np.int32)
+
+    prev_as = None
+    num_page = -1
+    continents = {'af' : 0, 'na' : 1, 'oc' : 2, 'an' : 3, 'as' : 4, 'eu' : 5, 'sa' : 6}
+    for i, entity in enumerate(ases):
+        key_as, loc = entity.rsplit('|', 1)
+        cont = loc[:2]
+        if entity != prev_as:
+            prev_as = entity
+            num_page += 1
+        result[num_page, continents[cont]] = i
+    return result[:num_page+1]
+
 
 def run():
     parser = argparse.ArgumentParser(description='Prepare data')
@@ -190,7 +228,14 @@ def run():
 
     # project date-dependent features (like day of week) to the future dates for prediction
     features_end = data + pd.Timedelta(args.add_days, unit='D')
-    print(f"start: {data_start}. end: {data_end}, features_end: {features_end}")
+    printf("start: {%s}, end: {%s}, features_end: {%s}", data_start, data_end, features_end)
+
+    # Group unique ases by continent
+    assert df.index.is_monotonic_increasing
+    continent_map = uniq_continent_map(df.index.values)
+
+    # Group unique ases by country
+    country_map = uniq_country_map(df.index.values)
 
     # yearly autocorrelation
     raw_year_autocorr = batch_autocorr(df.values, 365, starts, ends, 1.5, args.corr_backoffset)
@@ -216,8 +261,8 @@ def run():
     # Assemble indices for quarterly lagged data
     lagged_ix = np.stack(lag_indexes(data_start, features_end), axis=-1)
 
-    page_popularity = df.median(axis=1)
-    page_popularity = (page_popularity - page_popularity.mean()) / page_popularity.std()
+    #page_popularity = df.median(axis=1)
+    #page_popularity = (page_popularity - page_popularity.mean()) / page_popularity.std()
 
     # Put NaNs back
     df[nans] = np.NaN
@@ -226,9 +271,9 @@ def run():
     tensors = dict(
         hits=df,
         lagged_ix=lagged_ix,
-        page_map=page_map,
+        continent_map=continent_map,
+        country_map=country_map,
         page_ix=df.index.values,
-        page_popularity=page_popularity,
         year_autocorr=year_autocorr,
         quarter_autocorr=quarter_autocorr,
         dow=dow,
