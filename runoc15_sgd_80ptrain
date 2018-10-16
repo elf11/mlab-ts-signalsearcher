@@ -1,0 +1,75 @@
+Using TensorFlow backend.
+2018-10-16 00:30:47.909683: I tensorflow/core/platform/cpu_feature_guard.cc:141] Your CPU supports instructions that this TensorFlow binary was not compiled to use: AVX2 FMA
+2018-10-16 00:30:49.910789: I tensorflow/stream_executor/cuda/cuda_gpu_executor.cc:897] successful NUMA node read from SysFS had negative value (-1), but there must be at least one NUMA node, so returning NUMA node zero
+2018-10-16 00:30:49.911175: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1405] Found device 0 with properties: 
+name: Tesla K80 major: 3 minor: 7 memoryClockRate(GHz): 0.8235
+pciBusID: 0000:00:04.0
+totalMemory: 11.17GiB freeMemory: 11.10GiB
+2018-10-16 00:30:49.911196: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1484] Adding visible gpu devices: 0
+2018-10-16 00:30:50.210883: I tensorflow/core/common_runtime/gpu/gpu_device.cc:965] Device interconnect StreamExecutor with strength 1 edge matrix:
+2018-10-16 00:30:50.210930: I tensorflow/core/common_runtime/gpu/gpu_device.cc:971]      0 
+2018-10-16 00:30:50.210939: I tensorflow/core/common_runtime/gpu/gpu_device.cc:984] 0:   N 
+2018-10-16 00:30:50.211199: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1097] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:0 with 10758 MB memory) -> physical GPU (device: 0, name: Tesla K80, pci bus id: 0000:00:04.0, compute capability: 3.7)
+[Model] Model Compiled
+Time taken: 0:00:00.681745
+[Model] Training Started
+[Model] 2 epochs, 90 batch size, 26.0 batches per epoch
+Epoch 1/2
+
+ 1/26 [>.............................] - ETA: 1:47 - loss: 38.3958
+ 2/26 [=>............................] - ETA: 53s - loss: 21.9281 
+ 3/26 [==>...........................] - ETA: 35s - loss: 14.8715
+ 4/26 [===>..........................] - ETA: 26s - loss: 11.7956
+ 5/26 [====>.........................] - ETA: 20s - loss: 11.6339
+ 6/26 [=====>........................] - ETA: 17s - loss: 10.0606
+ 7/26 [=======>......................] - ETA: 14s - loss: 8.8079 
+ 8/26 [========>.....................] - ETA: 12s - loss: 7.9750
+ 9/26 [=========>....................] - ETA: 10s - loss: 7.1469
+10/26 [==========>...................] - ETA: 9s - loss: 6.4618 
+11/26 [===========>..................] - ETA: 8s - loss: 7.5763
+12/26 [============>.................] - ETA: 7s - loss: 7.0006
+13/26 [==============>...............] - ETA: 6s - loss: 6.5808
+14/26 [===============>..............] - ETA: 5s - loss: 6.1994
+15/26 [================>.............] - ETA: 4s - loss: 5.8162
+16/26 [=================>............] - ETA: 4s - loss: 5.7084
+17/26 [==================>...........] - ETA: 3s - loss: 5.4659
+18/26 [===================>..........] - ETA: 3s - loss: 5.2341
+19/26 [====================>.........] - ETA: 2s - loss: 7.7575
+20/26 [======================>.......] - ETA: 2s - loss: 7.5108
+21/26 [=======================>......] - ETA: 1s - loss: 7.6461
+22/26 [========================>.....] - ETA: 1s - loss: 7.6999
+23/26 [=========================>....] - ETA: 1s - loss: 9.6938
+24/26 [==========================>...] - ETA: 0s - loss: 9.3466
+25/26 [===========================>..] - ETA: 0s - loss: 59.3904
+26/26 [==============================] - 8s 319ms/step - loss: 63.4748
+Epoch 2/2
+
+ 1/26 [>.............................] - ETA: 4s - loss: 24.9582
+ 2/26 [=>............................] - ETA: 4s - loss: 26.8381
+ 3/26 [==>...........................] - ETA: 3s - loss: 24.8660
+ 4/26 [===>..........................] - ETA: 3s - loss: 18.8771
+ 5/26 [====>.........................] - ETA: 3s - loss: 15.2543
+ 6/26 [=====>........................] - ETA: 3s - loss: 12.9161
+ 7/26 [=======>......................] - ETA: 3s - loss: 12.2809
+ 8/26 [========>.....................] - ETA: 3s - loss: 10.9669
+ 9/26 [=========>....................] - ETA: 2s - loss: 9.8494 
+10/26 [==========>...................] - ETA: 2s - loss: 8.9330
+11/26 [===========>..................] - ETA: 2s - loss: 8.1465
+12/26 [============>.................] - ETA: 2s - loss: 7.4938
+13/26 [==============>...............] - ETA: 2s - loss: 8.1363
+14/26 [===============>..............] - ETA: 2s - loss: 7.5956
+15/26 [================>.............] - ETA: 1s - loss: 7.1863
+16/26 [=================>............] - ETA: 1s - loss: 6.7610
+17/26 [==================>...........] - ETA: 1s - loss: 6.3974
+18/26 [===================>..........] - ETA: 1s - loss: 6.2081
+19/26 [====================>.........] - ETA: 1s - loss: 5.9321
+20/26 [======================>.......] - ETA: 1s - loss: 6.1145
+21/26 [=======================>......] - ETA: 0s - loss: 7.4674
+22/26 [========================>.....] - ETA: 0s - loss: 7.2200
+23/26 [=========================>....] - ETA: 0s - loss: 7.2727
+24/26 [==========================>...] - ETA: 0s - loss: 7.2327
+25/26 [===========================>..] - ETA: 0s - loss: 8.9473
+26/26 [==============================] - 4s 168ms/step - loss: 54.1013
+[Model] Training Completed. Model saved as saved_models/16102018-003045-e2.h5
+Time taken: 0:00:14.901263
+[Model] Predicting Sequences Multiple...

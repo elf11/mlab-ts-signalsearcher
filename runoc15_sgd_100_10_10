@@ -1,0 +1,61 @@
+Using TensorFlow backend.
+2018-10-16 00:50:46.873460: I tensorflow/core/platform/cpu_feature_guard.cc:141] Your CPU supports instructions that this TensorFlow binary was not compiled to use: AVX2 FMA
+2018-10-16 00:50:48.867474: I tensorflow/stream_executor/cuda/cuda_gpu_executor.cc:897] successful NUMA node read from SysFS had negative value (-1), but there must be at least one NUMA node, so returning NUMA node zero
+2018-10-16 00:50:48.867889: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1405] Found device 0 with properties: 
+name: Tesla K80 major: 3 minor: 7 memoryClockRate(GHz): 0.8235
+pciBusID: 0000:00:04.0
+totalMemory: 11.17GiB freeMemory: 11.10GiB
+2018-10-16 00:50:48.867909: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1484] Adding visible gpu devices: 0
+2018-10-16 00:50:49.169319: I tensorflow/core/common_runtime/gpu/gpu_device.cc:965] Device interconnect StreamExecutor with strength 1 edge matrix:
+2018-10-16 00:50:49.169364: I tensorflow/core/common_runtime/gpu/gpu_device.cc:971]      0 
+2018-10-16 00:50:49.169374: I tensorflow/core/common_runtime/gpu/gpu_device.cc:984] 0:   N 
+2018-10-16 00:50:49.169643: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1097] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:0 with 10758 MB memory) -> physical GPU (device: 0, name: Tesla K80, pci bus id: 0000:00:04.0, compute capability: 3.7)
+[Model] Model Compiled
+Time taken: 0:00:00.676110
+[Model] Training Started
+[Model] 2 epochs, 90 batch size, 19.0 batches per epoch
+Epoch 1/2
+
+ 1/19 [>.............................] - ETA: 1:17 - loss: 38.5081
+ 2/19 [==>...........................] - ETA: 37s - loss: 22.0795 
+ 3/19 [===>..........................] - ETA: 24s - loss: 14.9956
+ 4/19 [=====>........................] - ETA: 17s - loss: 11.8992
+ 5/19 [======>.......................] - ETA: 13s - loss: 11.7127
+ 6/19 [========>.....................] - ETA: 11s - loss: 10.1471
+ 7/19 [==========>...................] - ETA: 9s - loss: 8.9027  
+ 8/19 [===========>..................] - ETA: 7s - loss: 8.0731
+ 9/19 [=============>................] - ETA: 6s - loss: 7.2395
+10/19 [==============>...............] - ETA: 5s - loss: 6.5470
+11/19 [================>.............] - ETA: 4s - loss: 7.6770
+12/19 [=================>............] - ETA: 3s - loss: 7.0976
+13/19 [===================>..........] - ETA: 2s - loss: 6.6785
+14/19 [=====================>........] - ETA: 2s - loss: 6.2982
+15/19 [======================>.......] - ETA: 1s - loss: 5.9132
+16/19 [========================>.....] - ETA: 1s - loss: 5.8123
+17/19 [=========================>....] - ETA: 0s - loss: 5.5650
+18/19 [===========================>..] - ETA: 0s - loss: 5.3350
+19/19 [==============================] - 7s 380ms/step - loss: 7.8830
+Epoch 2/2
+
+ 1/19 [>.............................] - ETA: 3s - loss: 3.1396
+ 2/19 [==>...........................] - ETA: 2s - loss: 8.9834
+ 3/19 [===>..........................] - ETA: 2s - loss: 15.0365
+ 4/19 [=====>........................] - ETA: 2s - loss: 11.5279
+ 5/19 [======>.......................] - ETA: 2s - loss: 9.3403 
+ 6/19 [========>.....................] - ETA: 2s - loss: 8.1486
+ 7/19 [==========>...................] - ETA: 1s - loss: 8.4339
+ 8/19 [===========>..................] - ETA: 1s - loss: 7.6761
+ 9/19 [=============>................] - ETA: 1s - loss: 6.9732
+10/19 [==============>...............] - ETA: 1s - loss: 6.3900
+11/19 [================>.............] - ETA: 1s - loss: 5.8482
+12/19 [=================>............] - ETA: 1s - loss: 5.3842
+13/19 [===================>..........] - ETA: 0s - loss: 6.3971
+14/19 [=====================>........] - ETA: 0s - loss: 5.9900
+15/19 [======================>.......] - ETA: 0s - loss: 5.7134
+16/19 [========================>.....] - ETA: 0s - loss: 5.3912
+17/19 [=========================>....] - ETA: 0s - loss: 5.1139
+18/19 [===========================>..] - ETA: 0s - loss: 5.0420
+19/19 [==============================] - 3s 165ms/step - loss: 4.8554
+[Model] Training Completed. Model saved as saved_models/16102018-005044-e2.h5
+Time taken: 0:00:12.621365
+[Model] Predicting Sequences Multiple...
